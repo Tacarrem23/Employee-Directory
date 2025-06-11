@@ -1,39 +1,34 @@
-const express = require('express');
+import express from "express";
 const app = express();
+export default app;
 
-// Sample employees array
-const employees = [
-  { id: 1, name: 'Alice' },
-  { id: 2, name: 'Bob' },
-  { id: 3, name: 'Charlie' }
-];
+import employees from "#db/employees";
 
-// GET / - returns welcome message
-app.get('/', (req, res) => {
-  res.send('Hello employees!');
+app.route("/").get((req, res) => {
+  res.send("Hello employees!");
 });
 
-// GET /employees - returns all employees
-app.get('/employees', (req, res) => {
-  res.json(employees);
+app.route("/employees").get((req, res) => {
+  res.send(employees);
 });
 
-// GET /employees/random - returns a random employee
-app.get('/employees/random', (req, res) => {
+// Note: this middleware has to come first! Otherwise, Express will treat
+// "random" as the argument to the `id` parameter of /employees/:id.
+app.route("/employees/random").get((req, res) => {
   const randomIndex = Math.floor(Math.random() * employees.length);
-  res.json(employees[randomIndex]);
+  res.send(employees[randomIndex]);
 });
 
-// GET /employees/:id - returns employee with matching id
-app.get('/employees/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const employee = employees.find(emp => emp.id === id);
+app.route("/employees/:id").get((req, res) => {
+  const { id } = req.params;
 
-  if (employee) {
-    res.json(employee);
-  } else {
-    res.status(404).send('Employee not found');
+  // req.params are always strings, so we need to convert `id` into a number
+  // before we can use it to find the employee
+  const employee = employees.find((e) => e.id === +id);
+
+  if (!employee) {
+    return res.status(404).send("Employee not found");
   }
-});
 
-module.exports = app;
+  res.send(employee);
+});
