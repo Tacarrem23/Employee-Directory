@@ -6,6 +6,10 @@ export default app;
 const express = require('express');
 const app = express();
 
+const employeeRoutes = require('./routes/employees');
+app.use('/employees', employeeRoutes);
+
+
 const employees = [
   { id: 1, name: 'John Doe', department: 'IT' },
   { id: 2, name: 'Jane Smith', department: 'HR' },
